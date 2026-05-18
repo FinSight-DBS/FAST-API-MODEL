@@ -1,58 +1,53 @@
-alembic==1.18.3
-annotated-doc==0.0.4
-annotated-types==0.7.0
-anyio==4.12.1
-argon2-cffi==25.1.0
-argon2-cffi-bindings==25.1.0
-asyncpg==0.31.0
-bcrypt==5.0.0
-black==26.1.0
-cffi==2.0.0
-cfgv==3.5.0
-click==8.3.1
-cryptography==46.0.4
-distlib==0.4.0
-dnspython==2.8.0
-email-validator==2.3.0
-fastapi==0.128.7
-fastapi-users==15.0.4
-fastapi-users-db-sqlalchemy==7.0.0
-filelock==3.20.3
-greenlet==3.3.1
-h11==0.16.0
-httptools==0.7.1
-identify==2.6.16
-idna==3.11
-iniconfig==2.3.0
-makefun==1.16.0
-mako==1.3.10
-markupsafe==3.0.3
-mypy-extensions==1.1.0
-nodeenv==1.10.0
-packaging==26.0
-pathspec==1.0.4
-platformdirs==4.5.1
-pluggy==1.6.0
-pre-commit==4.5.1
-psycopg2-binary==2.9.11
-pwdlib==0.3.0
-pycparser==3.0
-pydantic==2.12.5
-pydantic-core==2.41.5
-pygments==2.19.2
-pyjwt==2.11.0
-pytest==9.0.2
-python-dotenv==1.2.1
-python-multipart==0.0.22
-pytokens==0.4.1
-pyyaml==6.0.3
-ruff==0.15.0
-sqlalchemy==2.0.46
-starlette==0.52.1
-typing-extensions==4.15.0
-typing-inspection==0.4.2
-uvicorn==0.40.0
-uvloop==0.22.1
-virtualenv==20.36.1
-watchfiles==1.1.1
-websockets==16.0
+# Web Framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+uvloop==0.20.0
+httptools==0.6.4
+
+# Database
+sqlalchemy==2.0.36
+asyncpg==0.30.0
+greenlet==3.1.1
+
+# Config & Validation
+pydantic==2.9.2
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+
+# ML — Anomaly Detection
+tensorflow==2.15.1
+numpy==1.26.4
+
+# ML — Clustering
+scikit-learn==1.5.2
+joblib==1.4.2
+
+# ML — NLP (IndoBERT)
+transformers==4.44.2
+torch==2.4.1
+sentencepiece==0.2.0
+
+# RAG Pipeline
+sentence-transformers==3.1.1
+langchain==0.3.3
+langchain-community==0.3.3
+faiss-cpu==1.9.0
+
+# HTTP Client (call LLM API)
+httpx==0.27.2
+
+# Data Processing
+pandas==2.2.3
+
+# Date utilities
+python-dateutil==2.9.0.post0
+
+# Code Quality
+black==24.10.0
+ruff==0.7.0
+pre-commit==4.0.1
+
+# Testing
+pytest==8.3.3
+pytest-asyncio==0.24.0
+httpx==0.27.2
