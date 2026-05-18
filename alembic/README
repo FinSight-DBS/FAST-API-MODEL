@@ -1,1 +1,5 @@
 Generic single-database configuration.
+
+IMPORTANT: Migrations managed by NestJS TypeORM. Do not run alembic here.
+FastAPI is a read/write client of the shared PostgreSQL schema — it must never
+call Base.metadata.create_all() or execute any alembic upgrade/downgrade commands.
