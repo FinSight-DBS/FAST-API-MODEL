@@ -1,12 +1,11 @@
 from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel
-from pydantic.generics import GenericModel
 
 T = TypeVar("T")
 
 
-class HTTPDataResponse(GenericModel, Generic[T]):
+class HTTPDataResponse(BaseModel, Generic[T]):
     status: str
     data: T
     message: str
