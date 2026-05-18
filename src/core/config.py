@@ -1,66 +1,42 @@
-"""
-core.config
-Configuration settings for the application.
-"""
-
-import os
-
-from dotenv import load_dotenv
-
-load_dotenv()
+from pydantic_settings import BaseSettings
+from pydantic import computed_field
 
 
-class Settings:
-    """Centralized configuration settings."""
+class Settings(BaseSettings):
+    APP_ENV: str = "development"
+    PORT: int = 8000
 
-    def __init__(self) -> None:
-        self.APP_ENV = os.getenv("APP_ENV", "development")
+    DB_HOST: str
+    DB_PORT: int = 5432
+    DB_NAME: str
+    DB_USER: str
+    DB_PASSWORD: str
 
-        self.PORT = self._get_required_int("PORT", min_value=1, max_value=65535)
+    AUTOENCODER_MODEL_PATH: str
+    KMEANS_MODEL_PATH: str
+    KMEANS_LABEL_MAP_PATH: str
+    NLP_MODEL_PATH: str
+    NLP_TOKENIZER_PATH: str
 
-        self.DB_HOST = self._get_required("DB_HOST")
-        self.DB_PORT = self._get_required_int("DB_PORT", min_value=1, max_value=65535)
-        self.DB_NAME = self._get_required("DB_NAME")
-        self.DB_USER = self._get_required("DB_USER")
-        self.DB_PASSWORD = self._get_required("DB_PASSWORD")
+    ANOMALY_THRESHOLD_DEFAULT: float = 0.05
+    ANOMALY_MIN_TRANSACTION_COUNT: int = 15
+    ANOMALY_LOOKBACK_DAYS: int = 90
 
-        self.JWT_SECRET_KEY = self._get_required("JWT_SECRET_KEY")
-        self.JWT_EXPIRES_MINUTES = self._get_required_int(
-            "JWT_EXPIRES_MINUTES", min_value=1, max_value=365 * 24 * 60
-        )  # in minutes
-        self.JWT_ALGORITHM = "HS512"
+    LLM_API_URL: str
+    LLM_API_KEY: str
+    LLM_MODEL: str = "gpt-4o-mini"
 
-    @staticmethod
-    def _get_required(key: str) -> str:
-        value = os.getenv(key)
-        if value is None or value.strip() == "":
-            raise ValueError(f"Missing required environment variable: {key}")
-        return value.strip()
+    COLD_START_THRESHOLD_DAYS: int = 30
 
-    @staticmethod
-    def _get_required_int(key: str, *, min_value: int, max_value: int) -> int:
-        value = Settings._get_required(key)
-        try:
-            parsed = int(value)
-        except ValueError as exc:
-            raise ValueError(
-                f"Environment variable {key} must be an integer, got: {value}"
-            ) from exc
-
-        if parsed < min_value or parsed > max_value:
-            raise ValueError(
-                f"Environment variable {key} must be between {min_value} and {max_value}, got: {parsed}"
-            )
-
-        return parsed
-
+    @computed_field
     @property
-    def database_url(self) -> str:
-        """Full database connection URL."""
+    def DATABASE_URL(self) -> str:
         return (
             f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}"
             f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         )
+
+    model_config = {"env_file": ".env", "extra": "ignore"}
 
 
 settings = Settings()
