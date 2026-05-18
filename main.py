@@ -2,7 +2,7 @@
 
 import uvicorn
 
-from src.core.db import settings
+from src.core.config import settings
 
 if __name__ == "__main__":
-    uvicorn.run("src.app:app", host="0.0.0.0", port=int(settings.PORT), reload=True)
+    uvicorn.run("src.app:app", host="0.0.0.0", port=settings.PORT, reload=True)
