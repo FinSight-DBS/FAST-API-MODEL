@@ -1,18 +1,34 @@
 """Database setup and session management."""
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import (
+    create_async_engine,
+    AsyncSession,
+    async_sessionmaker,
+)
 from sqlalchemy.orm import DeclarativeBase
 from src.core.config import settings
 
-engine = create_async_engine(settings.database_url, echo=True)
-async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+engine = create_async_engine(
+    settings.DATABASE_URL,
+    echo=settings.APP_ENV == "development",
+    pool_size=10,
+    max_overflow=20,
+    pool_pre_ping=True,
+)
+
+AsyncSessionLocal = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
 
 
 class Base(DeclarativeBase):
-    """Base class for all ORM models."""
+    pass
 
 
-async def get_async_db_session():
-    """Get an asynchronous database session."""
-    async with async_session_maker() as session:
+# NOTE: Schema is owned by NestJS TypeORM.
+# FastAPI MUST NOT call Base.metadata.create_all() or run Alembic migrations.
+async def get_db() -> AsyncSession:
+    async with AsyncSessionLocal() as session:
         yield session
