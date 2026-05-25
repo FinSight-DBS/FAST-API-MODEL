@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 P2P_CATEGORY = "Transfer P2P"
 
 CATEGORY_MAP = {
-    # --- canonical NLP output labels (title case) ---
     "Transportasi": "needs",
     "Tagihan & Utilitas": "needs",
     "Kesehatan & Perawatan Diri": "needs",
@@ -24,23 +23,6 @@ CATEGORY_MAP = {
     "Investasi & Finansial": "savings",
     "Pendapatan Bulanan": None,
     "Pemasukan Tambahan": None,
-    # --- raw DB sub_category values (snake_case) ---
-    "sewa_kos": "needs",
-    "belanja_dapur": "needs",
-    "listrik": "needs",
-    "internet": "needs",
-    "bpjs_kesehatan": "needs",
-    "makan": "needs",
-    "transport": "needs",
-    "belanja_online": "wants",
-    "hiburan": "wants",
-    "makan_restoran": "wants",
-    "gadget": "wants",
-    "pakaian": "wants",
-    "kafe": "wants",
-    "langganan_streaming": "wants",
-    "Makan & Minum": "wants",
-    "transfer_tabungan": "savings",
 }
 
 
@@ -51,10 +33,6 @@ def _clean(text: str) -> str:
 
 
 def classify_p2p_transactions(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Reclassify transactions where sub_category == 'Transfer P2P'
-    using NLP model. Updates sub_category in-place.
-    """
     mask = df["sub_category"] == P2P_CATEGORY
     if not mask.any():
         return df
