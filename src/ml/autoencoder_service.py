@@ -1,10 +1,8 @@
 import logging
 from typing import List, Tuple
-
 import numpy as np
 import pandas as pd
-
-from src.ml.model_loader import get_autoencoder, get_autoencoder_meta
+from src.ml.model_loader import get_autoencoder
 from src.domain.entity.report import DetectedAnomaly
 
 logger = logging.getLogger(__name__)
@@ -127,17 +125,19 @@ def detect_anomalies(
 
 
 def _build_anomaly_context(row: pd.Series, df_baseline: pd.DataFrame) -> str:
+    df_excl = (
+        df_baseline[df_baseline["id"] != row["id"]]
+        if "id" in df_baseline.columns
+        else df_baseline
+    )
     z_lookup = (
-        df_baseline.groupby(["customer_id", "sub_category"])["amount"].mean().to_dict()
+        df_excl.groupby(["customer_id", "sub_category"])["amount"].mean().to_dict()
     )
     customer_id = str(row["customer_id"])
     sub_category = str(row["sub_category"])
     amount = float(row["amount"])
     timestamp = pd.Timestamp(row["transaction_timestamp"])
-    mae = float(row.get("mae", 0))
-    threshold = float(row.get("threshold", 0))
     z_score = float(row.get("amount_z_customer_kat", 0))
-
     hour = timestamp.hour
 
     def describe_hour(h: int) -> str:
@@ -153,12 +153,14 @@ def _build_anomaly_context(row: pd.Series, df_baseline: pd.DataFrame) -> str:
 
     parts = []
     baseline = z_lookup.get((customer_id, sub_category))
+
     if baseline and baseline > 0:
         ratio = amount / baseline
         parts.append(
             f"Nominal Rp {amount:,.0f} ({ratio:.1f}x rata-rata historis "
             f"user di {sub_category}: Rp {baseline:,.0f})"
         )
+
     if abs(z_score) >= 2.0:
         lbl = "sangat tinggi" if z_score > 0 else "sangat rendah"
         parts.append(
