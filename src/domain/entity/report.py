@@ -2,6 +2,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Optional
 
+from src.domain.entity.enums import PersonaEnum
+
 
 @dataclass
 class WeeklyReport:
@@ -22,8 +24,8 @@ class WeeklyReport:
 class MonthlyReport:
     customer_id: str
     target_month: str
-    persona: str
-    prev_persona: Optional[str]
+    persona: PersonaEnum
+    prev_persona: Optional[PersonaEnum]
     savings_rate: float
     wants_ratio: float
     needs_ratio: float
