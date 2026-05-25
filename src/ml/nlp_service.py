@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 P2P_CATEGORY = "Transfer P2P"
 
 CATEGORY_MAP = {
+    # --- canonical NLP output labels (title case) ---
     "Transportasi": "needs",
     "Tagihan & Utilitas": "needs",
     "Kesehatan & Perawatan Diri": "needs",
@@ -23,6 +24,23 @@ CATEGORY_MAP = {
     "Investasi & Finansial": "savings",
     "Pendapatan Bulanan": None,
     "Pemasukan Tambahan": None,
+    # --- raw DB sub_category values (snake_case) ---
+    "sewa_kos": "needs",
+    "belanja_dapur": "needs",
+    "listrik": "needs",
+    "internet": "needs",
+    "bpjs_kesehatan": "needs",
+    "makan": "needs",
+    "transport": "needs",
+    "belanja_online": "wants",
+    "hiburan": "wants",
+    "makan_restoran": "wants",
+    "gadget": "wants",
+    "pakaian": "wants",
+    "kafe": "wants",
+    "langganan_streaming": "wants",
+    "Makan & Minum": "wants",
+    "transfer_tabungan": "savings",
 }
 
 
