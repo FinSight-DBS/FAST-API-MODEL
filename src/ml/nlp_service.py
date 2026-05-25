@@ -1,7 +1,6 @@
 import re
 import logging
 from typing import List
-
 import pandas as pd
 
 from src.ml.model_loader import get_nlp_pipeline

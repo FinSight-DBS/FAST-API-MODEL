@@ -8,7 +8,12 @@ from src.ml.model_loader import get_clustering_pipeline
 
 logger = logging.getLogger(__name__)
 
-COLS_TO_LOG = ["wants_frequency", "weekend_surge", "balance_volatility", "survival_mode_days"]
+COLS_TO_LOG = [
+    "wants_frequency",
+    "weekend_surge",
+    "balance_volatility",
+    "survival_mode_days",
+]
 
 
 def compute_monthly_features(
@@ -26,8 +31,12 @@ def compute_monthly_features(
     wants_ratio = wants_nom / total_pengeluaran if total_pengeluaran > 0 else 0
     fixed_costs_ratio = needs_nom / total_pengeluaran if total_pengeluaran > 0 else 0
 
-    investasi_nom = df_debit[df_debit["sub_category"] == "Investasi & Finansial"]["amount"].sum()
-    saldo_akhir = df_all["running_balance"].iloc[-1] if len(df_all) else prev_month_balance
+    investasi_nom = df_debit[df_debit["sub_category"] == "Investasi & Finansial"][
+        "amount"
+    ].sum()
+    saldo_akhir = (
+        df_all["running_balance"].iloc[-1] if len(df_all) else prev_month_balance
+    )
     delta_saldo = saldo_akhir - prev_month_balance
     savings_rate = (investasi_nom + delta_saldo) / gaji if gaji > 0 else 0
 
@@ -37,7 +46,9 @@ def compute_monthly_features(
     small_leaks_ratio = df_debit[df_debit["amount"] < 30_000].shape[0] / total_trx
 
     if "hour" in df_debit.columns:
-        night_trx = df_debit[(df_debit["hour"] >= 22) | (df_debit["hour"] <= 4)].shape[0]
+        night_trx = df_debit[(df_debit["hour"] >= 22) | (df_debit["hour"] <= 4)].shape[
+            0
+        ]
     else:
         night_trx = 0
     night_owl_spending = night_trx / total_trx
@@ -47,7 +58,9 @@ def compute_monthly_features(
         weekday_data = df_debit[df_debit["day_of_week"] < 5]
         avg_wknd = weekend_data["amount"].mean() if not weekend_data.empty else 0
         avg_wkdy = weekday_data["amount"].mean() if not weekday_data.empty else 0
-        weekend_surge = avg_wknd / avg_wkdy if avg_wkdy > 0 else (1 if avg_wknd > 0 else 0)
+        weekend_surge = (
+            avg_wknd / avg_wkdy if avg_wkdy > 0 else (1 if avg_wknd > 0 else 0)
+        )
     else:
         weekend_surge = 1.0
 
@@ -82,9 +95,16 @@ def compute_monthly_features(
 
 
 ALL_FEATURES = [
-    "wants_ratio", "fixed_costs_ratio", "savings_rate", "wants_frequency",
-    "small_leaks_ratio", "night_owl_spending", "weekend_surge",
-    "early_month_depletion", "balance_volatility", "survival_mode_days",
+    "wants_ratio",
+    "fixed_costs_ratio",
+    "savings_rate",
+    "wants_frequency",
+    "small_leaks_ratio",
+    "night_owl_spending",
+    "weekend_surge",
+    "early_month_depletion",
+    "balance_volatility",
+    "survival_mode_days",
 ]
 
 
