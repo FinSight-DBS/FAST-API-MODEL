@@ -10,8 +10,6 @@ from src.domain.entity.report import DetectedAnomaly
 logger = logging.getLogger(__name__)
 
 MIN_Z = 3
-# Column names as they exist in the trained model artifacts
-_CONT_COLS = ["nominal", "hour_sin", "hour_cos", "nominal_z_user_kat"]
 
 
 def preprocess_for_autoencoder(df: pd.DataFrame, meta: dict) -> np.ndarray:
@@ -23,7 +21,6 @@ def preprocess_for_autoencoder(df: pd.DataFrame, meta: dict) -> np.ndarray:
     OHE_COLS = meta["ohe_cols"]
 
     df = df.copy()
-    # Map current entity column names to names used during model training
     df = df.rename(
         columns={
             "sub_category": "kategori_detail",
@@ -51,11 +48,9 @@ def preprocess_for_autoencoder(df: pd.DataFrame, meta: dict) -> np.ndarray:
         0.0,
     )
 
-    scaled_cont = scaler.transform(df[_CONT_COLS])
-    for i, col in enumerate(_CONT_COLS):
-        df[f"{col}_scaled"] = scaled_cont[:, i]
-    for col in OHE_COLS:
-        df[f"{col}_scaled"] = df[col].astype(np.float32)
+    scaled = scaler.transform(df[FEAT])
+    for i, col in enumerate(FEAT):
+        df[f"{col}_scaled"] = scaled[:, i]
 
     df["nominal_z_user_kat_scaled"] = df["nominal_z_user_kat_scaled"].clip(-5, 5)
 
