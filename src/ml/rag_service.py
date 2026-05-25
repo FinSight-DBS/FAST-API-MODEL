@@ -7,21 +7,16 @@ from src.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT_COACH = """Kamu adalah FinSight AI Coach — asisten keuangan personal yang cerdas, empatik, dan berbicara seperti teman yang jujur. Tugasmu adalah membantu nasabah memahami pola keuangan mereka berdasarkan data transaksi nyata.
+SYSTEM_PROMPT_COACH = """Kamu adalah FinSight AI Coach — asisten keuangan personal yang berbicara seperti teman dekat yang jujur dan peduli. Tugasmu adalah membantu nasabah memahami pola keuangan mereka berdasarkan data transaksi nyata.
 
-Gaya komunikasi:
-- Gunakan bahasa Indonesia yang lugas dan hangat
-- Sertakan angka spesifik (nominal Rupiah, persentase)
-- Hindari jargon keuangan yang membingungkan
-- Jika ada anomali, sampaikan dengan hati-hati tapi tegas
-- Akhiri dengan 1-3 rekomendasi konkret dan dapat dilaksanakan
-
-Format laporan:
-1. Sapaan personal (sebutkan nama jika tersedia)
-2. Ringkasan performa periode ini
-3. Analisis pola (Wants vs Needs, tabungan)
-4. Peringatan anomali (jika ada)
-5. Rekomendasi ke depan"""
+Aturan penulisan yang WAJIB diikuti:
+- Tulis dalam bentuk paragraf mengalir, bukan poin-poin atau daftar bernomor
+- DILARANG menggunakan heading, subjudul, atau tanda bintang untuk bold/italic
+- DILARANG menggunakan emoji atau emoticon dalam bentuk apapun
+- Gunakan bahasa Indonesia yang hangat, natural, dan seperti percakapan
+- Sertakan angka spesifik (nominal Rupiah, persentase) langsung di dalam kalimat
+- Sampaikan semua hal — baik, buruk, maupun anomali — dalam alur narasi yang mengalir
+- Tutup dengan 2-3 saran konkret yang disampaikan dalam bentuk kalimat biasa, bukan poin"""
 
 
 def build_weekly_context(
@@ -120,15 +115,17 @@ def _get_llm_client() -> AsyncOpenAI:
 
 async def call_llm(context: str, is_monthly: bool = False) -> str:
     instruction = (
-        "Buatkan laporan bulanan AI Coach berdasarkan data di atas. "
-        "Evaluasi bulan: pencapaian & kegagalan, highlight perubahan persona jika ada, "
-        "analisis pola perilaku yang menonjol, rekomendasi konkret untuk bulan berikutnya, "
-        "peringatan khusus jika ada survival_mode atau early_depletion ekstrem."
+        "Tulis laporan bulanan dalam tepat 3 paragraf padat, tanpa heading, poin, atau emoji. "
+        "Paragraf 1: ringkasan performa bulan ini — angka utama, persona, dan apakah keuangan sehat atau tidak. "
+        "Paragraf 2: 2-3 pola perilaku paling menonjol dari data, langsung ke intinya. "
+        "Paragraf 3: 2-3 saran konkret untuk bulan depan dalam kalimat biasa. "
+        "Tidak perlu basa-basi, sapaan panjang, atau pengulangan data."
         if is_monthly
-        else "Buatkan laporan mingguan AI Coach berdasarkan data di atas. "
-        "Gaya: personal, empatik, berbasis data. "
-        "Struktur: ringkasan pengeluaran, insight pola wants/needs, "
-        "peringatan anomali jika ada, rekomendasi 2-3 langkah konkret minggu depan."
+        else "Tulis laporan mingguan dalam tepat 3 paragraf padat, tanpa heading, poin, atau emoji. "
+        "Paragraf 1: ringkasan pengeluaran minggu ini — total, proporsi wants vs needs, kondisi saldo. "
+        "Paragraf 2: anomali atau pola yang perlu diperhatikan, langsung ke intinya. "
+        "Paragraf 3: 2-3 saran konkret untuk minggu depan dalam kalimat biasa. "
+        "Tidak perlu basa-basi, sapaan panjang, atau pengulangan data."
     )
 
     client = _get_llm_client()
@@ -139,7 +136,7 @@ async def call_llm(context: str, is_monthly: bool = False) -> str:
             {"role": "user", "content": f"{context}\n\nINSTRUKSI:\n{instruction}"},
         ],
         temperature=0.7,
-        max_tokens=1200,
+        max_tokens=600,
         extra_body={"reasoning": {"enabled": True}},
     )
     return response.choices[0].message.content
