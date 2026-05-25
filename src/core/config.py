@@ -18,11 +18,13 @@ class Settings(BaseSettings):
     NLP_MODEL_PATH: str
     NLP_TOKENIZER_PATH: str
 
+    INTERNAL_API_KEY: str = "dev-internal-key"
+
     ANOMALY_THRESHOLD_DEFAULT: float = 0.05
     ANOMALY_MIN_TRANSACTION_COUNT: int = 15
     ANOMALY_LOOKBACK_DAYS: int = 90
 
-    LLM_API_URL: str
+    LLM_API_URL: str = "https://api.openai.com/v1"
     LLM_API_KEY: str
     LLM_MODEL: str = "gpt-4o-mini"
 
