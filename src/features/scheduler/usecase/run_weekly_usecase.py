@@ -40,13 +40,21 @@ class RunWeeklyUseCase:
             trx_repo = TransactionRepository(db)
             report_repo = ReportRepository(db)
 
-            customer_ids = request.customer_ids or await trx_repo.find_active_customer_ids()
+            customer_ids = (
+                request.customer_ids or await trx_repo.find_active_customer_ids()
+            )
             logger.info(f"[{job_id}] Processing {len(customer_ids)} customers")
 
             for chunk_start in range(0, len(customer_ids), CHUNK_SIZE):
-                chunk = customer_ids[chunk_start: chunk_start + CHUNK_SIZE]
+                chunk = customer_ids[chunk_start : chunk_start + CHUNK_SIZE]
                 await self._process_chunk(
-                    job_id, chunk, period_start, period_end, trx_repo, report_repo, request.dry_run
+                    job_id,
+                    chunk,
+                    period_start,
+                    period_end,
+                    trx_repo,
+                    report_repo,
+                    request.dry_run,
                 )
 
         logger.info(f"[{job_id}] Weekly pipeline completed")
@@ -68,7 +76,11 @@ class RunWeeklyUseCase:
 
         df = pd.DataFrame([vars(t) for t in transactions])
         baseline_txns = await trx_repo.find_all_for_baseline(customer_ids)
-        df_baseline = pd.DataFrame([vars(t) for t in baseline_txns]) if baseline_txns else df.copy()
+        df_baseline = (
+            pd.DataFrame([vars(t) for t in baseline_txns])
+            if baseline_txns
+            else df.copy()
+        )
 
         df = classify_p2p_transactions(df)
         df = map_main_category(df)
@@ -86,18 +98,28 @@ class RunWeeklyUseCase:
         for customer_id in customer_ids:
             customer_df = df[df["customer_id"] == customer_id]
             if customer_df.empty:
-                logger.warning(f"[{job_id}] No data for customer {customer_id}, skipping")
+                logger.warning(
+                    f"[{job_id}] No data for customer {customer_id}, skipping"
+                )
                 continue
             try:
                 await self._generate_report(
-                    job_id, customer_id, customer_df,
+                    job_id,
+                    customer_id,
+                    customer_df,
                     df if has_ae else None,
                     None if not has_ae else X_scaled[df["customer_id"] == customer_id],
                     model_meta,
-                    df_baseline, period_start, period_end, report_repo, dry_run,
+                    df_baseline,
+                    period_start,
+                    period_end,
+                    report_repo,
+                    dry_run,
                 )
             except Exception as e:
-                logger.error(f"[{job_id}] Failed for customer {customer_id}: {e}", exc_info=True)
+                logger.error(
+                    f"[{job_id}] Failed for customer {customer_id}: {e}", exc_info=True
+                )
 
     async def _generate_report(
         self,
@@ -116,10 +138,15 @@ class RunWeeklyUseCase:
         report_id = str(uuid.uuid4())
 
         total_expenses = int(customer_df["amount"].sum())
-        wants_nom = int(customer_df[customer_df["main_category"] == "wants"]["amount"].sum())
-        needs_nom = int(customer_df[customer_df["main_category"] == "needs"]["amount"].sum())
-        wants_ratio = wants_nom / total_expenses if total_expenses > 0 else 0.0
-        needs_ratio = needs_nom / total_expenses if total_expenses > 0 else 0.0
+        wants_nom = int(
+            customer_df[customer_df["main_category"] == "wants"]["amount"].sum()
+        )
+        needs_nom = int(
+            customer_df[customer_df["main_category"] == "needs"]["amount"].sum()
+        )
+        consumable_total = wants_nom + needs_nom
+        wants_ratio = wants_nom / consumable_total if consumable_total > 0 else 0.0
+        needs_ratio = needs_nom / consumable_total if consumable_total > 0 else 0.0
 
         anomali_list = []
         if X_customer is not None and model_meta is not None:
@@ -134,8 +161,14 @@ class RunWeeklyUseCase:
             )
             anomali_list = anomalies
 
-        persona = await report_repo.get_latest_monthly_persona(customer_id) or "Unconflicted"
-        saldo_terakhir = float(customer_df["running_balance"].iloc[-1]) if not customer_df.empty else 0.0
+        persona = (
+            await report_repo.get_latest_monthly_persona(customer_id) or "Unconflicted"
+        )
+        saldo_terakhir = (
+            float(customer_df["running_balance"].iloc[-1])
+            if not customer_df.empty
+            else 0.0
+        )
 
         top_anomalies = sorted(
             anomali_list, key=lambda a: a.mae / (a.threshold_val + 1e-9), reverse=True
