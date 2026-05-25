@@ -1,6 +1,6 @@
 import uuid
 from typing import List, Optional
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, func
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.domain.entity.report import WeeklyReport, MonthlyReport, DetectedAnomaly
@@ -16,65 +16,75 @@ class ReportRepository(IReportRepository):
 
     async def upsert_weekly_report(self, report: WeeklyReport) -> str:
         report_id = report.id or str(uuid.uuid4())
-        stmt = pg_insert(WeeklyReportTable).values(
-            id=report_id,
-            customer_id=report.customer_id,
-            report_date=report.report_date,
-            period_start=report.period_start,
-            persona=report.persona,
-            wants_ratio=report.wants_ratio,
-            needs_ratio=report.needs_ratio,
-            total_expenses=report.total_expenses,
-            anomaly_count=report.anomaly_count,
-            report_text=report.report_text,
-        ).on_conflict_do_update(
-            constraint="uq_weekly_customer_date",
-            set_={
-                "persona": report.persona,
-                "wants_ratio": report.wants_ratio,
-                "needs_ratio": report.needs_ratio,
-                "total_expenses": report.total_expenses,
-                "anomaly_count": report.anomaly_count,
-                "report_text": report.report_text,
-                "generated_at": "NOW()",
-            },
-        ).returning(WeeklyReportTable.id)
+        stmt = (
+            pg_insert(WeeklyReportTable)
+            .values(
+                id=report_id,
+                customer_id=report.customer_id,
+                report_date=report.report_date,
+                period_start=report.period_start,
+                persona=report.persona,
+                wants_ratio=report.wants_ratio,
+                needs_ratio=report.needs_ratio,
+                total_expenses=report.total_expenses,
+                anomaly_count=report.anomaly_count,
+                report_text=report.report_text,
+            )
+            .on_conflict_do_update(
+                constraint="uq_weekly_customer_date",
+                set_={
+                    "persona": report.persona,
+                    "wants_ratio": report.wants_ratio,
+                    "needs_ratio": report.needs_ratio,
+                    "total_expenses": report.total_expenses,
+                    "anomaly_count": report.anomaly_count,
+                    "report_text": report.report_text,
+                    "generated_at": func.now(),
+                },
+            )
+            .returning(WeeklyReportTable.id)
+        )
         result = await self.db.execute(stmt)
         await self.db.commit()
         return result.scalar_one()
 
     async def upsert_monthly_report(self, report: MonthlyReport) -> str:
         report_id = report.id or str(uuid.uuid4())
-        stmt = pg_insert(MonthlyReportTable).values(
-            id=report_id,
-            customer_id=report.customer_id,
-            target_month=report.target_month,
-            persona=report.persona,
-            prev_persona=report.prev_persona,
-            savings_rate=report.savings_rate,
-            wants_ratio=report.wants_ratio,
-            needs_ratio=report.needs_ratio,
-            wants_amount=report.wants_amount,
-            needs_amount=report.needs_amount,
-            savings_amount=report.savings_amount,
-            behavioral_features=report.behavioral_features,
-            report_text=report.report_text,
-        ).on_conflict_do_update(
-            constraint="uq_monthly_customer_month",
-            set_={
-                "persona": report.persona,
-                "prev_persona": report.prev_persona,
-                "savings_rate": report.savings_rate,
-                "wants_ratio": report.wants_ratio,
-                "needs_ratio": report.needs_ratio,
-                "wants_amount": report.wants_amount,
-                "needs_amount": report.needs_amount,
-                "savings_amount": report.savings_amount,
-                "behavioral_features": report.behavioral_features,
-                "report_text": report.report_text,
-                "generated_at": "NOW()",
-            },
-        ).returning(MonthlyReportTable.id)
+        stmt = (
+            pg_insert(MonthlyReportTable)
+            .values(
+                id=report_id,
+                customer_id=report.customer_id,
+                target_month=report.target_month,
+                persona=report.persona,
+                prev_persona=report.prev_persona,
+                savings_rate=report.savings_rate,
+                wants_ratio=report.wants_ratio,
+                needs_ratio=report.needs_ratio,
+                wants_amount=report.wants_amount,
+                needs_amount=report.needs_amount,
+                savings_amount=report.savings_amount,
+                behavioral_features=report.behavioral_features,
+                report_text=report.report_text,
+            )
+            .on_conflict_do_update(
+                constraint="uq_monthly_customer_month",
+                set_={
+                    "persona": report.persona,
+                    "prev_persona": report.prev_persona,
+                    "savings_rate": report.savings_rate,
+                    "wants_ratio": report.wants_ratio,
+                    "needs_ratio": report.needs_ratio,
+                    "wants_amount": report.wants_amount,
+                    "needs_amount": report.needs_amount,
+                    "savings_amount": report.savings_amount,
+                    "behavioral_features": report.behavioral_features,
+                    "report_text": report.report_text,
+                    "generated_at": func.now(),
+                },
+            )
+            .returning(MonthlyReportTable.id)
+        )
         result = await self.db.execute(stmt)
         await self.db.commit()
         return result.scalar_one()

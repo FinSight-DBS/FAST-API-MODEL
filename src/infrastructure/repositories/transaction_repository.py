@@ -45,6 +45,7 @@ class TransactionRepository(ITransactionRepository):
         self, customer_ids: List[str], lookback_days: int = 90
     ) -> List[Transaction]:
         from datetime import datetime
+
         cutoff = datetime.utcnow().date() - timedelta(days=lookback_days)
         result = await self.db.execute(
             select(TransactionTable).where(
@@ -57,8 +58,9 @@ class TransactionRepository(ITransactionRepository):
         )
         return [row.to_domain() for row in result.scalars().all()]
 
-    async def find_active_customer_ids(self) -> List[str]:
-        result = await self.db.execute(
-            select(TransactionTable.customer_id).distinct()
-        )
+    async def find_active_user_ids(self) -> List[str]:
+        result = await self.db.execute(select(TransactionTable.customer_id).distinct())
         return list(result.scalars().all())
+
+    async def find_active_customer_ids(self) -> List[str]:
+        return await self.find_active_user_ids()
