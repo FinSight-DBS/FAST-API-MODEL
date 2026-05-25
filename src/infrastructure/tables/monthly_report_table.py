@@ -1,23 +1,56 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import String, BigInteger, Text, DateTime, func, Numeric, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from typing import Optional
+from sqlalchemy import (
+    String,
+    BigInteger,
+    Text,
+    DateTime,
+    func,
+    Numeric,
+    UniqueConstraint,
+)
+from sqlalchemy.dialects.postgresql import UUID, JSONB, ENUM
 from sqlalchemy.orm import Mapped, mapped_column
 from src.core.db import Base
+from src.domain.entity.enums import PersonaEnum
 from src.domain.entity.report import MonthlyReport
+
+_persona_enum = ENUM(
+    "Tightwad",
+    "Unconflicted",
+    "Spendthrift",
+    name="monthly_reports_persona_enum",
+    create_type=False,
+)
+_prev_persona_enum = ENUM(
+    "Tightwad",
+    "Unconflicted",
+    "Spendthrift",
+    name="monthly_reports_prev_persona_enum",
+    create_type=False,
+)
 
 
 class MonthlyReportTable(Base):
     __tablename__ = "monthly_reports"
-    __table_args__ = (UniqueConstraint("customer_id", "target_month", name="uq_monthly_customer_month"),)
+    __table_args__ = (
+        UniqueConstraint(
+            "customer_id", "target_month", name="uq_monthly_customer_month"
+        ),
+    )
 
     id: Mapped[str] = mapped_column(
         UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    customer_id: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=False, index=True)
+    customer_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), nullable=False, index=True
+    )
     target_month: Mapped[str] = mapped_column(String(7), nullable=False)
-    persona: Mapped[str] = mapped_column(String(20), nullable=False)
-    prev_persona: Mapped[str] = mapped_column(String(20), nullable=True)
+    persona: Mapped[str] = mapped_column(_persona_enum, nullable=False)
+    prev_persona: Mapped[Optional[str]] = mapped_column(
+        _prev_persona_enum, nullable=True
+    )
     savings_rate: Mapped[float] = mapped_column(Numeric(6, 4), nullable=False)
     wants_ratio: Mapped[float] = mapped_column(Numeric(5, 4), nullable=False)
     needs_ratio: Mapped[float] = mapped_column(Numeric(5, 4), nullable=False)
@@ -35,8 +68,8 @@ class MonthlyReportTable(Base):
             id=self.id,
             customer_id=self.customer_id,
             target_month=self.target_month,
-            persona=self.persona,
-            prev_persona=self.prev_persona,
+            persona=PersonaEnum(self.persona),
+            prev_persona=PersonaEnum(self.prev_persona) if self.prev_persona else None,
             savings_rate=float(self.savings_rate),
             wants_ratio=float(self.wants_ratio),
             needs_ratio=float(self.needs_ratio),
