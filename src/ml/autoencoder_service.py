@@ -10,7 +10,8 @@ from src.domain.entity.report import DetectedAnomaly
 logger = logging.getLogger(__name__)
 
 MIN_Z = 3
-CONTINUOUS_COLS = ["amount", "hour_sin", "hour_cos", "amount_z_customer_kat"]
+# Column names as they exist in the trained model artifacts
+_CONT_COLS = ["nominal", "hour_sin", "hour_cos", "nominal_z_user_kat"]
 
 
 def preprocess_for_autoencoder(df: pd.DataFrame, meta: dict) -> np.ndarray:
@@ -22,33 +23,41 @@ def preprocess_for_autoencoder(df: pd.DataFrame, meta: dict) -> np.ndarray:
     OHE_COLS = meta["ohe_cols"]
 
     df = df.copy()
+    # Map current entity column names to names used during model training
+    df = df.rename(
+        columns={
+            "sub_category": "kategori_detail",
+            "customer_id": "id_user",
+            "amount": "nominal",
+        }
+    )
 
     df["hour"] = pd.to_datetime(df["transaction_timestamp"]).dt.hour
     df["hour_sin"] = np.sin(2 * np.pi * df["hour"] / 24)
     df["hour_cos"] = np.cos(2 * np.pi * df["hour"] / 24)
 
-    df["amount"] = df["amount"].clip(upper=df["sub_category"].map(kat_cap))
-    df["amount"] = np.log1p(df["amount"])
+    df["nominal"] = df["nominal"].clip(upper=df["kategori_detail"].map(kat_cap))
+    df["nominal"] = np.log1p(df["nominal"])
 
-    df[OHE_COLS] = ohe.transform(df[["sub_category"]])
+    df[OHE_COLS] = ohe.transform(df[["kategori_detail"]])
 
-    tmp = df[["customer_id", "sub_category", "amount"]].merge(
-        z_stats, on=["customer_id", "sub_category"], how="left"
+    tmp = df[["id_user", "kategori_detail", "nominal"]].merge(
+        z_stats, on=["id_user", "kategori_detail"], how="left"
     )
     valid = tmp["z_count"].ge(MIN_Z) & tmp["z_mean"].notna()
-    df["amount_z_customer_kat"] = np.where(
+    df["nominal_z_user_kat"] = np.where(
         valid,
-        (tmp["amount"] - tmp["z_mean"]) / (tmp["z_std"].fillna(0) + 1e-9),
+        (tmp["nominal"] - tmp["z_mean"]) / (tmp["z_std"].fillna(0) + 1e-9),
         0.0,
     )
 
-    scaled_cont = scaler.transform(df[CONTINUOUS_COLS])
-    for i, col in enumerate(CONTINUOUS_COLS):
+    scaled_cont = scaler.transform(df[_CONT_COLS])
+    for i, col in enumerate(_CONT_COLS):
         df[f"{col}_scaled"] = scaled_cont[:, i]
     for col in OHE_COLS:
         df[f"{col}_scaled"] = df[col].astype(np.float32)
 
-    df["amount_z_customer_kat_scaled"] = df["amount_z_customer_kat_scaled"].clip(-5, 5)
+    df["nominal_z_user_kat_scaled"] = df["nominal_z_user_kat_scaled"].clip(-5, 5)
 
     SCALED_COLS = [f"{c}_scaled" for c in FEAT]
     return df[SCALED_COLS].values.astype(np.float32)
@@ -124,9 +133,7 @@ def detect_anomalies(
 
 def _build_anomaly_context(row: pd.Series, df_baseline: pd.DataFrame) -> str:
     z_lookup = (
-        df_baseline.groupby(["customer_id", "sub_category"])["amount"]
-        .mean()
-        .to_dict()
+        df_baseline.groupby(["customer_id", "sub_category"])["amount"].mean().to_dict()
     )
     customer_id = str(row["customer_id"])
     sub_category = str(row["sub_category"])
@@ -163,7 +170,9 @@ def _build_anomaly_context(row: pd.Series, df_baseline: pd.DataFrame) -> str:
             f"Z-score {z_score:+.2f} — nominal {lbl} dibanding pola historis user ini"
         )
 
-    parts.append(f"Waktu transaksi {describe_hour(hour)} — jam yang tidak lazim untuk {sub_category}")
+    parts.append(
+        f"Waktu transaksi {describe_hour(hour)} — jam yang tidak lazim untuk {sub_category}"
+    )
 
     seen: set = set()
     unique = []
