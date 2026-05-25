@@ -160,6 +160,16 @@ class RunWeeklyUseCase:
                 customer_full_df, X_customer, model_meta, customer_baseline, report_id
             )
             anomali_list = anomalies
+            if anomali_list:
+                print(
+                    f"[{job_id}] ⚠ {len(anomali_list)} anomali terdeteksi untuk customer {customer_id}:"
+                )
+                for a in anomali_list:
+                    print(
+                        f"  - sub_category={a.sub_category} | amount={a.amount} "
+                        f"| mae={a.mae:.2f} | threshold={a.threshold_val:.2f} "
+                        f"| ratio={a.ratio:.2f}"
+                    )
 
         persona = (
             await report_repo.get_latest_monthly_persona(customer_id) or "Unconflicted"
@@ -202,6 +212,9 @@ class RunWeeklyUseCase:
             report_text = await call_llm(context, is_monthly=False)
         except Exception as e:
             logger.error(f"[{job_id}] LLM call failed for {customer_id}: {e}")
+            report_text = None
+
+        if not report_text:
             report_text = f"[LLM unavailable] {context}"
 
         report = WeeklyReport(
