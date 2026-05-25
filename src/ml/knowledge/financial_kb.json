@@ -1,0 +1,100 @@
+{
+  "articles": [
+    {
+      "id": "rule_50_30_20",
+      "title": "Aturan Anggaran 50/30/20 untuk Keuangan Sehat",
+      "content": "Aturan 50/30/20 membagi penghasilan menjadi tiga bagian: 50% untuk Needs (kebutuhan pokok seperti makanan, transportasi, tagihan), 30% untuk Wants (keinginan seperti hiburan, makan di luar, belanja online), dan 20% untuk tabungan atau investasi. Jika wants ratio melebihi 30%, perlu segera dikurangi dengan menunda pembelian tidak mendesak. Jika savings rate di bawah 20%, coba otomatisasi tabungan di awal bulan sebelum uang terpakai. Benchmark internasional: savings rate ideal 20-30%, wants ratio ideal 20-30%, needs ratio ideal 40-55%.",
+      "tags": ["budgeting", "50-30-20", "needs", "wants", "savings", "alokasi", "benchmark"]
+    },
+    {
+      "id": "persona_tightwad",
+      "title": "Persona Tightwad: Ciri, Kelebihan, dan Saran",
+      "content": "Tightwad adalah tipe hemat ekstrem yang sulit membelanjakan uang bahkan untuk hal yang dibutuhkan. Ciri-ciri: wants ratio sangat rendah (<15%), menghindari pengeluaran meski untuk keperluan penting, bisa mengalami kualitas hidup yang menurun. Kelebihan: tabungan tinggi, disiplin keuangan. Risiko: bisa stres karena terlalu menahan diri, melewatkan investasi pada kesehatan dan produktivitas. Saran untuk Tightwad: izinkan diri sendiri pengeluaran 'worth it' yang meningkatkan kualitas hidup, bedakan antara hemat dan pelit, alokasikan minimal 15% untuk wants yang bermakna (olahraga, pengembangan diri, waktu bersama keluarga). Jika savings rate sudah >30%, mulai pertimbangkan investasi produktif.",
+      "tags": ["tightwad", "hemat", "persona", "kualitas-hidup", "tabungan"]
+    },
+    {
+      "id": "persona_unconflicted",
+      "title": "Persona Unconflicted: Seimbang dan Stabil",
+      "content": "Unconflicted adalah tipe yang seimbang antara kesenangan dan tanggung jawab keuangan. Ciri-ciri: wants ratio 20-35%, needs ratio 40-55%, savings rate 15-25%. Tipe ini paling sehat secara finansial. Kelebihan: tidak terlalu pelit, tidak boros, stabil. Risiko: bisa terlena dan tidak sadar saat mulai bergeser ke Spendthrift jika tidak dipantau. Saran untuk Unconflicted: pertahankan pola ini, tingkatkan savings rate secara bertahap, mulai investasi jangka panjang (reksa dana, saham), buat dana darurat 3-6 bulan pengeluaran, review anggaran setiap 3 bulan untuk memastikan tidak bergeser.",
+      "tags": ["unconflicted", "seimbang", "persona", "stabil", "investasi"]
+    },
+    {
+      "id": "persona_spendthrift",
+      "title": "Persona Spendthrift: Boros dan Cara Mengatasinya",
+      "content": "Spendthrift adalah tipe yang mudah sekali membelanjakan uang, seringkali melebihi penghasilan. Ciri-ciri: wants ratio >40%, savings rate rendah atau negatif, impulse buying tinggi, sering merasa uang selalu kurang. Pemicu umum: belanja online, makan di luar, hiburan, FOMO (fear of missing out). Cara mengatasi: (1) Buat budget ketat dan patuhi, (2) Hapus aplikasi belanja online dari ponsel selama 2 minggu, (3) Terapkan aturan 24 jam: tunda pembelian >Rp 200.000 minimal 24 jam, (4) Bayar tunai atau transfer manual (bukan auto-debit) untuk pengeluaran wants, (5) Cari teman accountability yang sama-sama ingin perbaiki keuangan, (6) Tentukan 'jatah senang' mingguan yang pasti, selebihnya harus ditahan.",
+      "tags": ["spendthrift", "boros", "persona", "impulse-buying", "kontrol-pengeluaran"]
+    },
+    {
+      "id": "anomali_transaksi",
+      "title": "Memahami Anomali Transaksi Keuangan",
+      "content": "Anomali transaksi adalah pengeluaran yang secara signifikan melebihi pola biasamu di kategori tertentu. Bukan berarti pengeluaran tersebut salah, tapi perlu diperhatikan. Contoh anomali: biasanya makan Rp 50.000/hari tapi hari ini Rp 300.000, atau biasanya transport Rp 20.000 tapi tiba-tiba Rp 500.000. Apa yang harus dilakukan: (1) Periksa apakah pengeluaran tersebut memang direncanakan (ulang tahun, darurat, dll), (2) Jika tidak direncanakan, identifikasi pemicunya (stres, bosan, FOMO), (3) Jika anomali sering berulang di kategori sama, anggaran di kategori itu mungkin tidak realistis, (4) Gunakan anomali sebagai sinyal untuk review kebiasaan belanja. Banyak anomali dalam seminggu = perlu segera review anggaran.",
+      "tags": ["anomali", "transaksi-tidak-biasa", "review", "pola-belanja"]
+    },
+    {
+      "id": "survival_mode",
+      "title": "Mode Survival: Ketika Saldo Kritis",
+      "content": "Mode survival terjadi saat saldo rekening jatuh di bawah 15% dari gaji bulanan, menandakan keuangan dalam kondisi kritis menjelang gajian. Situasi ini sangat berbahaya karena: rentan hutang dadakan, tidak bisa handle darurat, stres finansial mempengaruhi produktivitas. Tindakan darurat saat survival mode: (1) STOP semua pengeluaran wants sampai gajian, (2) Hitung sisa hari hingga gajian dan bagi saldo yang ada, (3) Hubungi keluarga/teman jika benar-benar darurat, (4) Jual barang yang tidak dipakai untuk cash cepat. Setelah gajian: (1) Langsung sisihkan dana darurat 1-2 bulan pengeluaran, (2) Review kenapa bisa sampai survival mode, (3) Buat anggaran lebih ketat bulan depan, (4) Pertimbangkan sumber penghasilan tambahan.",
+      "tags": ["survival-mode", "saldo-rendah", "kritis", "darurat", "manajemen-krisis"]
+    },
+    {
+      "id": "early_month_depletion",
+      "title": "Efek Paycheck: Boros di Awal Bulan",
+      "content": "Early month depletion atau 'efek paycheck' terjadi ketika terlalu banyak uang dihabiskan di awal bulan setelah gajian, menyebabkan kekurangan di akhir bulan. Pola berbahaya ini sangat umum di Indonesia. Tanda-tanda: 50%+ pengeluaran bulanan terjadi di 10 hari pertama bulan. Cara mengatasi: (1) Terapkan sistem 'pay yourself first': langsung transfer ke tabungan di hari gajian sebelum belanja apapun, (2) Bagi uang ke amplop/rekening berbeda: kebutuhan, keinginan, tabungan, (3) Tunggu 3-7 hari setelah gajian sebelum belanja besar non-esensial, (4) Buat daftar belanja bulanan dan patuhi, (5) Hindari mall/marketplace di minggu pertama bulan. Psikologi: adrenalin melihat saldo tinggi mendorong belanja impulsif. Sadar akan ini sudah jadi separuh solusinya.",
+      "tags": ["early-depletion", "paycheck-effect", "awal-bulan", "boros", "disiplin"]
+    },
+    {
+      "id": "night_owl_spending",
+      "title": "Belanja Dini Hari: Jebakan Pembelian Impulsif",
+      "content": "Pengeluaran di dini hari (tengah malam hingga subuh) sangat berisiko karena kemampuan kontrol diri menurun saat lelah. Penelitian menunjukkan keputusan keuangan malam hari cenderung lebih impulsif dan dipengaruhi emosi. Pemicu umum: scroll media sosial sambil tiduran lalu klik beli, bosan dan tidak bisa tidur, promo flash sale tengah malam. Cara menghentikan kebiasaan ini: (1) Nonaktifkan notifikasi aplikasi belanja jam 10 malam - 7 pagi, (2) Log out dari semua akun belanja online di ponsel malam hari, (3) Hapus informasi kartu kredit yang tersimpan di aplikasi, (4) Alihkan kebiasaan dengan membaca buku, meditasi, atau mendengar podcast, (5) Jika tergoda, tulis di catatan, tidur dulu, baru putuskan pagi hari.",
+      "tags": ["night-owl", "belanja-malam", "impulsif", "kontrol-diri", "kebiasaan"]
+    },
+    {
+      "id": "weekend_surge",
+      "title": "Lonjakan Pengeluaran Weekend: Normal atau Berbahaya?",
+      "content": "Pengeluaran yang jauh lebih tinggi di weekend dibanding weekday bisa menjadi tanda konsumsi berlebih. Weekend surge >2x weekday perlu diperhatikan serius. Penyebab umum: makan di restoran mahal, nongkrong kafe, hiburan (bioskop, konser), belanja impulsif di mall, aktivitas sosial berbiaya tinggi. Yang perlu diingat: social spending (nongkrong, makan bareng) sulit dihindari tapi harus dikontrol. Strategi: (1) Tentukan 'weekend budget' sebelum akhir pekan datang, (2) Bawa uang tunai terbatas untuk batasi pengeluaran, (3) Cari alternatif hemat untuk aktivitas sosial (piknik, masak bareng, olahraga outdoor), (4) Jika sering weekend surge karena teman yang boros, pertimbangkan untuk selektif dalam aktivitas sosial berbayar, (5) Rencanakan weekend activities dari Kamis malam agar tidak spontan.",
+      "tags": ["weekend-surge", "pengeluaran-akhir-pekan", "sosial", "kontrol", "budget"]
+    },
+    {
+      "id": "small_leaks",
+      "title": "Kebocoran Kecil: Pengeluaran Kecil yang Menguras Dompet",
+      "content": "Small leaks atau kebocoran kecil adalah transaksi-transaksi kecil (<Rp 30.000) yang tampak tidak signifikan tapi bisa menguras anggaran secara kumulatif. Contoh: kopi kafe setiap hari (Rp 30.000 x 30 = Rp 900.000/bulan), cemilan ATM (Rp 15.000 x 4 minggu = Rp 60.000/bulan), parkir (Rp 5.000 x 2/hari = Rp 300.000/bulan). Kuncinya adalah kesadaran, bukan kepanikan. Cara mengatasinya: (1) Catat semua pengeluaran kecil selama 1 minggu, kamu akan terkejut dengan totalnya, (2) Identifikasi 3 kebocoran terbesar dan cari alternatif murah, (3) Bawa bekal dan kopi dari rumah 3 dari 5 hari kerja, (4) Batch trips untuk hemat parkir dan transport, (5) Jangan menghilangkan semua kenikmatan kecil, pilih 1-2 yang paling bermakna dan pertahankan.",
+      "tags": ["small-leaks", "kebocoran", "pengeluaran-kecil", "kumulatif", "audit"]
+    },
+    {
+      "id": "savings_strategy",
+      "title": "Strategi Menabung Efektif untuk Pemula",
+      "content": "Menabung bukan tentang sisa uang setelah belanja, tapi prioritas utama. Piramida tabungan yang tepat: (1) Dana Darurat 3-6 bulan pengeluaran (prioritas tertinggi), (2) Tabungan tujuan jangka pendek <1 tahun (liburan, gadget, dll), (3) Investasi jangka menengah 1-5 tahun (DP rumah, pendidikan), (4) Investasi jangka panjang >5 tahun (pensiun, properti). Cara memulai: (1) Hitung pengeluaran bulanan rata-rata, (2) Buka rekening tabungan terpisah untuk dana darurat, (3) Set auto-debit ke rekening tabungan di hari gajian, (4) Mulai dengan Rp 200.000-500.000/bulan lalu tingkatkan, (5) Untuk investasi, mulai reksa dana pasar uang (aman, likuid, return lebih dari tabungan). Benchmark Indonesia: idealnya saving rate 20-30% dari take-home pay.",
+      "tags": ["tabungan", "saving-rate", "dana-darurat", "investasi", "strategi"]
+    },
+    {
+      "id": "balance_volatility",
+      "title": "Volatilitas Saldo: Tanda Manajemen Cash Flow Lemah",
+      "content": "Volatilitas saldo yang tinggi (naik turun drastis dalam sebulan) menandakan cash flow tidak terkontrol dengan baik. Ini bisa disebabkan oleh: pengeluaran impulsif, tidak ada anggaran yang jelas, penghasilan tidak tetap, atau kebiasaan menabung tidak konsisten. Dampak volatilitas tinggi: susah merencanakan keuangan, rawan terjebak hutang, stres finansial kronik. Cara menstabilkan saldo: (1) Buat anggaran mingguan, bukan hanya bulanan, (2) Hindari pengeluaran besar (>Rp 500.000) tanpa perencanaan 1-2 hari sebelumnya, (3) Pertimbangkan rekening terpisah untuk kebutuhan rutin, (4) Jika penghasilan tidak tetap, buat baseline kebutuhan bulanan minimum dan tabung selebihnya saat pemasukan tinggi, (5) Review saldo setiap minggu bukan hanya saat mau belanja.",
+      "tags": ["volatilitas", "saldo", "cash-flow", "stabilitas", "manajemen"]
+    },
+    {
+      "id": "wants_control",
+      "title": "Cara Efektif Mengontrol Pengeluaran Wants",
+      "content": "Wants adalah pengeluaran yang membuat hidup lebih nyaman tapi tidak esensial: makan di restoran, hiburan, fashion, gadget, langganan streaming. Wants ratio >40% dari total pengeluaran adalah sinyal bahaya. Teknik kontrol wants: (1) Aturan 24 jam: tunda semua keputusan belanja >Rp 100.000 minimal 24 jam, (2) Buat wish list bukan keranjang belanja: simpan barang yang ingin dibeli, review seminggu kemudian apakah masih mau, (3) Unsubscribe semua email promo dan notifikasi flash sale, (4) Batch pengeluaran wants: belanja online hanya 1x seminggu, (5) Tentukan 'senin bebas wants' dan 'jumat cek anggaran', (6) Visualisasikan trade-off: Rp 300.000 untuk makan enak = 1.5 bulan langganan gym, (7) Jika merasa FOMO, ingat bahwa social media hanya menampilkan momen terbaik orang lain.",
+      "tags": ["wants", "kontrol-pengeluaran", "disiplin", "fomo", "teknik"]
+    },
+    {
+      "id": "needs_efficiency",
+      "title": "Mengoptimalkan Pengeluaran Needs agar Lebih Efisien",
+      "content": "Needs adalah pengeluaran pokok yang tidak bisa dihindari, tapi bisa dioptimalkan. Jika needs ratio >60%, perlu dicari cara efisiensi. Kategori needs yang sering bisa dikurangi: (1) Makanan: masak sendiri 4 dari 7 hari bisa hemat 30-50%, (2) Transportasi: gabung teman (carpooling) atau beralih ke transportasi umum, (3) Listrik dan air: matikan perangkat yang tidak dipakai, hemat air, (4) Belanja bulanan: buat daftar belanja, hindari pergi supermarket lapar, manfaatkan promo yang sudah direncanakan bukan dadakan. Needs yang tidak boleh dikurangi: kesehatan preventif (suplemen, olahraga), pendidikan dan pengembangan diri, asuransi dasar. Ingat: berhemat pada needs bukan berarti menyiksa diri, tapi memilih opsi yang sama nilainya dengan harga lebih baik.",
+      "tags": ["needs", "efisiensi", "pengeluaran-pokok", "hemat", "optimasi"]
+    },
+    {
+      "id": "persona_shift",
+      "title": "Perubahan Persona Keuangan: Apa Artinya?",
+      "content": "Perubahan persona keuangan (misalnya dari Unconflicted ke Spendthrift, atau dari Tightwad ke Unconflicted) mencerminkan perubahan signifikan dalam pola belanja bulanan. Perubahan menuju Spendthrift (memburuk): bisa dipicu oleh stres kerja, hubungan sosial baru yang konsumtif, promosi jabatan (lifestyle inflation), atau kehilangan disiplin keuangan. Tindakan: segera evaluasi apa yang berubah bulan ini, kembali ke anggaran yang lebih ketat. Perubahan menuju Tightwad dari Unconflicted: bisa dipicu oleh tekanan keuangan atau tujuan menabung agresif, pastikan tidak mengorbankan kebutuhan dasar. Perubahan menuju Unconflicted (membaik): apresiasi dan pertahankan momentum, jangan sampai terlena dan kembali ke pola lama.",
+      "tags": ["persona-change", "perubahan-persona", "lifestyle-inflation", "evaluasi"]
+    },
+    {
+      "id": "income_expense_balance",
+      "title": "Menjaga Keseimbangan Pemasukan dan Pengeluaran",
+      "content": "Keuangan sehat bukan hanya soal hemat, tapi soal keseimbangan antara penghasilan dan pengeluaran. Jika pengeluaran terus meningkat tanpa peningkatan penghasilan, akan ada masalah. Tanda-tanda ketidakseimbangan: savings rate negatif (lebih banyak keluar dari masuk), sering pakai kartu kredit untuk kebutuhan sehari-hari, tidak bisa bayar cicilan tepat waktu. Solusi dari sisi penghasilan: (1) Negosiasi kenaikan gaji setelah 1 tahun kerja, (2) Kembangkan skill yang meningkatkan nilai jual, (3) Cari penghasilan sampingan (freelance, jualan online, konten kreator), (4) Manfaatkan cashback dan reward points dengan bijak. Solusi dari sisi pengeluaran: audit lengkap pengeluaran, eliminasi langganan yang jarang dipakai, renegotiasi harga (kontrak internet, premi asuransi).",
+      "tags": ["pemasukan", "pengeluaran", "keseimbangan", "savings-rate-negatif", "penghasilan"]
+    }
+  ]
+}
