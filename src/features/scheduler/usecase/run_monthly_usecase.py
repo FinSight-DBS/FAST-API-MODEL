@@ -3,7 +3,7 @@ import uuid
 from calendar import monthrange
 from dataclasses import dataclass, field
 from datetime import date
-from typing import List, Optional
+from typing import List
 
 import pandas as pd
 
@@ -17,7 +17,6 @@ from src.ml.nlp_service import classify_p2p_transactions, map_main_category
 from src.ml.rag_service import build_monthly_context, call_llm
 
 logger = logging.getLogger(__name__)
-
 CHUNK_SIZE = 50
 
 
