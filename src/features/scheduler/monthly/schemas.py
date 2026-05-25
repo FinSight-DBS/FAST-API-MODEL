@@ -1,5 +1,7 @@
+import re
 from typing import List, Optional
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class MonthlySchedulerRequest(BaseModel):
@@ -8,6 +10,13 @@ class MonthlySchedulerRequest(BaseModel):
         default=None, description="Format YYYY-MM. Default: bulan lalu"
     )
     dry_run: bool = Field(default=False)
+
+    @field_validator("target_month")
+    @classmethod
+    def validate_target_month(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not re.match(r"^\d{4}-\d{2}$", v):
+            raise ValueError("target_month harus format YYYY-MM, contoh: 2025-04")
+        return v
 
 
 class MonthlyJobResponse(BaseModel):
