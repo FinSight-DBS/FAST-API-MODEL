@@ -1,4 +1,5 @@
 import uuid
+from datetime import date
 from typing import List, Optional
 from sqlalchemy import select, delete, func
 from sqlalchemy.dialects.postgresql import insert as pg_insert
@@ -92,6 +93,12 @@ class ReportRepository(IReportRepository):
     async def save_anomalies(self, anomalies: List[DetectedAnomaly]) -> None:
         if not anomalies:
             return
+        weekly_report_id = anomalies[0].weekly_report_id
+        await self.db.execute(
+            delete(DetectedAnomalyTable).where(
+                DetectedAnomalyTable.weekly_report_id == weekly_report_id
+            )
+        )
         rows = [
             DetectedAnomalyTable(
                 id=str(uuid.uuid4()),
@@ -109,6 +116,18 @@ class ReportRepository(IReportRepository):
         ]
         self.db.add_all(rows)
         await self.db.commit()
+
+    async def find_weekly_report(
+        self, customer_id: str, period_start: date, period_end: date
+    ) -> Optional[str]:
+        result = await self.db.execute(
+            select(WeeklyReportTable.id)
+            .where(WeeklyReportTable.customer_id == customer_id)
+            .where(WeeklyReportTable.period_start == period_start)
+            .where(WeeklyReportTable.report_date == period_end)
+            .limit(1)
+        )
+        return result.scalar_one_or_none()
 
     async def get_latest_monthly_persona(self, customer_id: str) -> Optional[str]:
         result = await self.db.execute(
