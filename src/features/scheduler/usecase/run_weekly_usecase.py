@@ -230,6 +230,12 @@ class RunWeeklyUseCase:
             savings_amount=float(savings_nom),
         )
 
+        if not dry_run:
+            existing_id = await report_repo.find_weekly_report(customer_id, period_start, period_end)
+            if existing_id:
+                logger.info(f"[{job_id}] Report already exists for {customer_id} ({period_start}~{period_end}), skipping LLM call")
+                return
+
         try:
             report_text = await call_llm(
                 context,
