@@ -1,6 +1,7 @@
 import json
 import logging
-import os
+import re
+from pathlib import Path
 from typing import List, Optional
 
 from openai import AsyncOpenAI
@@ -15,7 +16,7 @@ _KB_CACHE = None
 def _load_kb() -> dict:
     global _KB_CACHE
     if _KB_CACHE is None:
-        kb_path = os.path.join(os.path.dirname(__file__), "knowledge", "financial_kb.json")
+        kb_path = Path(__file__).resolve().parent / "knowledge" / "financial_kb.json"
         with open(kb_path, encoding="utf-8") as f:
             _KB_CACHE = json.load(f)
     return _KB_CACHE
@@ -70,24 +71,28 @@ def get_relevant_rules(
 
     return "\n".join(lines)
 
-SYSTEM_PROMPT_COACH = """Kamu adalah FinSight AI Coach — asisten keuangan personal yang berbicara seperti teman dekat yang jujur dan peduli. Tugasmu adalah membantu nasabah memahami pola keuangan mereka berdasarkan data transaksi nyata.
+SYSTEM_PROMPT_COACH = """Kamu adalah FinSight AI Coach — asisten keuangan personal yang berbicara seperti teman dekat yang jujur, hangat, dan peduli. Bukan konsultan keuangan formal. Bukan robot laporan. Teman yang kebetulan paham soal uang.
 
 Format laporan mingguan yang WAJIB diikuti:
-- PEMBUKA: 2-3 kalimat paragraf singkat berisi ringkasan angka utama
-- ANOMALI: jika ada anomali, tampilkan sebagai bullet points dengan tanda "•" (bukan angka, bukan tanda "-")
-- PENUTUP: 3-4 kalimat paragraf berisi saran konkret
+- PEMBUKA: 2-3 kalimat ringkas, langsung ke poin, pakai angka tapi dirangkai dalam kalimat yang mengalir
+- ANOMALI: jika ada anomali, tampilkan sebagai bullet points dengan tanda "•"
+- PENUTUP: 3-4 kalimat saran konkret, terasa seperti rekomendasi dari teman, bukan instruksi buku teks
 
 Larangan keras:
 - DILARANG menggunakan heading, subjudul, atau tanda bintang untuk bold/italic
 - DILARANG menggunakan emoji atau emoticon dalam bentuk apapun
 - DILARANG menggunakan poin bernomor (1. 2. 3.) di bagian manapun
+- DILARANG menggunakan tanda hubung panjang (—) atau em-dash dalam bentuk apapun
 - Bullet points "•" HANYA boleh digunakan untuk daftar anomali, tidak untuk saran
 - Saran di bagian penutup WAJIB ditulis dalam bentuk kalimat biasa, bukan poin
 
 Prinsip penulisan:
-- Gunakan bahasa Indonesia yang hangat, natural, dan seperti percakapan
-- Sertakan angka spesifik (nominal Rupiah, persentase) langsung di dalam kalimat
-- Kamu adalah penasihat finansial yang logis — saran harus realistis, berbasis data, tidak menghakimi"""
+- Bahasa Indonesia santai tapi tidak alay — seperti WhatsApp ke teman yang dipercaya
+- Angka WAJIB ditulis dalam bentuk angka/digit, BUKAN dieja dalam kata ("Rp 3.500.000" bukan "tiga juta lima ratus ribu", "87%" bukan "hampir sembilan puluh persen", "23x" bukan "dua puluh tiga kali")
+- DILARANG menyebut istilah teknis seperti "penyimpangan", "rata-rata historis", "anomali", "rasio", "volatilitas" langsung ke nasabah
+- Kalau ada pengeluaran yang tidak biasa, jelaskan dengan bahasa manusia: "kamu belanja jauh lebih banyak dari biasanya di kategori ini"
+- Saran harus terasa bisa dilakukan hari ini, bukan teori
+- Tidak menghakimi, tidak menggurui, tidak panik"""
 
 PERSONA_GUIDANCE = {
     "Spendthrift": (
@@ -260,9 +265,15 @@ async def call_llm(
         )
     else:
         anomaly_block = (
-            "[ANOMALI] Setelah pembuka, tampilkan daftar anomali dengan format bullet tepat seperti ini "
-            "(gunakan tanda • bukan - atau angka, maksimal 4 bullet, urutkan dari nominal terbesar):\n"
-            "• [KATEGORI] Rp X | Penyimpangan Y% dari rata-rata historis, terjadi pukul HH.00\n"
+            "[ANOMALI] Setelah pembuka, tampilkan daftar anomali sebagai bullet points "
+            "(gunakan tanda •, maksimal 4 bullet, urutkan dari nominal terbesar).\n"
+            "Untuk setiap anomali, gunakan data ratio dari context (misal '23.3x rata-rata historis') "
+            "dan ekspresikan dalam kalimat biasa — bukan persentase, bukan istilah teknis seperti Z-score.\n"
+            "Format yang harus diikuti:\n"
+            "• [KATEGORI] Rp X — [seberapa besar dibanding biasanya, pakai angka kelipatan], [waktu kejadian]\n\n"
+            "Contoh BENAR: '• [Hiburan & Langganan] Rp 3.500.000 — sekitar 23 kali lebih besar dari rata-rata kamu di sini, terjadi siang hari'\n"
+            "Contoh SALAH: '• [Hiburan & Langganan] Rp 3.500.000 — kamu belanja lebih banyak dari biasanya'\n"
+            "Contoh SALAH: '• [Hiburan & Langganan] Rp 3.500.000 | Penyimpangan 2230% | Z-score +4.2'\n"
             if has_anomaly
             else ""
         )
@@ -288,4 +299,7 @@ async def call_llm(
         max_tokens=650,
         extra_body={"reasoning": {"enabled": True}},
     )
-    return response.choices[0].message.content
+    content = response.choices[0].message.content or ""
+    content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)
+    content = re.sub(r".*?</think>", "", content, flags=re.DOTALL)
+    return content.strip()
