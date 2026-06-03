@@ -1,8 +1,9 @@
 import uuid
 from datetime import date
 
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 
+from src.core.config import settings
 from src.features.scheduler.monthly.schemas import MonthlyJobResponse, MonthlySchedulerRequest
 from src.features.scheduler.scheduler_dependencies import (
     get_run_monthly_use_case,
@@ -23,6 +24,8 @@ async def trigger_weekly(
     _: None = Depends(verify_internal_key),
     use_case: RunWeeklyUseCase = Depends(get_run_weekly_use_case),
 ):
+    if req.dry_run and settings.APP_ENV == "production":
+        raise HTTPException(status_code=400, detail="dry_run tidak diizinkan di environment production")
     job_id = f"weekly-{date.today()}-{uuid.uuid4().hex[:6]}"
     request = RunWeeklyRequest(
         job_id=job_id,
@@ -46,6 +49,8 @@ async def trigger_monthly(
     _: None = Depends(verify_internal_key),
     use_case: RunMonthlyUseCase = Depends(get_run_monthly_use_case),
 ):
+    if req.dry_run and settings.APP_ENV == "production":
+        raise HTTPException(status_code=400, detail="dry_run tidak diizinkan di environment production")
     if req.target_month:
         target_month_str = req.target_month
     else:

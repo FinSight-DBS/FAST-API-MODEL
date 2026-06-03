@@ -11,6 +11,13 @@ class MonthlySchedulerRequest(BaseModel):
     )
     dry_run: bool = Field(default=False)
 
+    @field_validator("customer_ids")
+    @classmethod
+    def limit_batch_size(cls, v: List[str]) -> List[str]:
+        if len(v) > 100:
+            raise ValueError("customer_ids maksimal 100. Untuk semua customer, kirim list kosong []")
+        return v
+
     @field_validator("target_month")
     @classmethod
     def validate_target_month(cls, v: Optional[str]) -> Optional[str]:
