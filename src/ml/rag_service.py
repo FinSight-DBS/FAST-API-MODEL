@@ -1,4 +1,6 @@
+import json
 import logging
+import os
 from typing import List, Optional
 
 from openai import AsyncOpenAI
@@ -6,6 +8,67 @@ from openai import AsyncOpenAI
 from src.core.config import settings
 
 logger = logging.getLogger(__name__)
+
+_KB_CACHE = None
+
+
+def _load_kb() -> dict:
+    global _KB_CACHE
+    if _KB_CACHE is None:
+        kb_path = os.path.join(os.path.dirname(__file__), "knowledge", "financial_kb.json")
+        with open(kb_path, encoding="utf-8") as f:
+            _KB_CACHE = json.load(f)
+    return _KB_CACHE
+
+
+def get_relevant_rules(
+    persona: str,
+    wants_ratio: float,
+    has_anomaly: bool,
+    savings_rate: float = 0.0,
+) -> str:
+    try:
+        kb = _load_kb()
+    except Exception as e:
+        logger.warning(f"KB load failed: {e}")
+        return ""
+
+    articles = kb.get("articles", [])
+
+    priority_tags: List[str] = []
+    if wants_ratio > 0.6:
+        priority_tags.extend(["wants", "50-30-20", "kontrol-pengeluaran"])
+    elif wants_ratio > 0.4:
+        priority_tags.extend(["wants", "disiplin"])
+    if has_anomaly:
+        priority_tags.extend(["anomali", "impulsif"])
+    if savings_rate < 0.1:
+        priority_tags.extend(["tabungan", "dana-darurat", "saving-rate"])
+
+    persona_tags = {
+        "Spendthrift": ["spendthrift", "impulse-buying", "kontrol-pengeluaran"],
+        "Tightwad": ["tightwad", "investasi"],
+        "Unconflicted": ["unconflicted", "investasi", "stabil"],
+    }
+    priority_tags.extend(persona_tags.get(persona, []))
+
+    scored = []
+    for article in articles:
+        tags = article.get("tags", [])
+        score = sum(1 for t in priority_tags if t in tags)
+        if score > 0:
+            scored.append((score, article))
+
+    scored.sort(key=lambda x: -x[0])
+
+    lines = []
+    for _, article in scored[:3]:
+        content = article["content"]
+        # Ambil kalimat pertama sebagai key insight
+        first_sentence = content.split(". ")[0] + "."
+        lines.append(f"- {first_sentence}")
+
+    return "\n".join(lines)
 
 SYSTEM_PROMPT_COACH = """Kamu adalah FinSight AI Coach — asisten keuangan personal yang berbicara seperti teman dekat yang jujur dan peduli. Tugasmu adalah membantu nasabah memahami pola keuangan mereka berdasarkan data transaksi nyata.
 
@@ -100,6 +163,14 @@ def build_weekly_context(
 
     savings_line = f"\n- Tabungan/Investasi   : Rp {savings_amount:,.0f}" if savings_amount > 0 else ""
 
+    kb_rules = get_relevant_rules(
+        persona=persona,
+        wants_ratio=wants_ratio,
+        has_anomaly=bool(anomali_list),
+        savings_rate=savings_amount / gaji if gaji > 0 else 0.0,
+    )
+    kb_section = f"\n\nPANDUAN FINANSIAL RELEVAN:\n{kb_rules}" if kb_rules else ""
+
     return f"""=== DATA KEUANGAN MINGGUAN ===
 Periode       : {period_start} s/d {period_end}
 Nasabah       : {user_name}
@@ -109,7 +180,7 @@ Saldo Akhir   : Rp {saldo_terakhir:,.0f}
 RINGKASAN 7 HARI:
 - Total Pengeluaran : Rp {total_pengeluaran:,.0f}{gaji_pct_line}
 - Wants (keinginan) : Rp {wants_amount:,.0f} ({wants_ratio:.1%})
-- Needs (kebutuhan) : Rp {needs_amount:,.0f} ({needs_ratio:.1%}){savings_line}{top_cats_section}{anomali_section}"""
+- Needs (kebutuhan) : Rp {needs_amount:,.0f} ({needs_ratio:.1%}){savings_line}{top_cats_section}{anomali_section}{kb_section}"""
 
 
 def build_monthly_context(
@@ -143,6 +214,14 @@ def build_monthly_context(
 - Volatilitas Saldo         : {behavioral_features.get('balance_volatility', 0):.2f} (std/gaji)
 - Hari "Tanggal Tua"        : {behavioral_features.get('survival_mode_days', 0)} hari (saldo < 15% gaji)"""
 
+    kb_rules = get_relevant_rules(
+        persona=persona_baru,
+        wants_ratio=wants_ratio,
+        has_anomaly=False,
+        savings_rate=savings_rate,
+    )
+    kb_section = f"\n\nPANDUAN FINANSIAL RELEVAN:\n{kb_rules}" if kb_rules else ""
+
     return f"""=== DATA KEUANGAN BULANAN ===
 Bulan         : {target_month}
 Nasabah       : {user_name} ({user_id})
@@ -155,7 +234,7 @@ RINGKASAN BULAN INI:
 - Total Needs   : Rp {needs_amount:,.0f} ({needs_ratio:.1%})
 - Total Tabungan: Rp {savings_amount:,.0f} (savings rate: {savings_rate:.1%})
 
-{behavioral}"""
+{behavioral}{kb_section}"""
 
 
 def _get_llm_client() -> AsyncOpenAI:
