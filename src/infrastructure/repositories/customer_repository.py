@@ -18,6 +18,16 @@ class CustomerRepository:
             return float(row[0])
         return 0.0
 
+    async def get_profile(self, customer_id: str) -> tuple:
+        result = await self.db.execute(
+            text("SELECT full_name, monthly_income FROM customer WHERE id = :customer_id"),
+            {"customer_id": customer_id},
+        )
+        row = result.fetchone()
+        if row:
+            return str(row[0]), float(row[1] or 0)
+        return customer_id, 0.0
+
     async def update_base_persona(self, customer_id: str, persona: str) -> None:
         await self.db.execute(
             text("UPDATE customer SET base_persona = :persona WHERE id = :customer_id"),

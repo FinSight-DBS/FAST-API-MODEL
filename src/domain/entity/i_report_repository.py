@@ -19,3 +19,8 @@ class IReportRepository(ABC):
 
     @abstractmethod
     async def get_latest_monthly_persona(self, user_id: str) -> Optional[str]: ...
+
+    @abstractmethod
+    async def find_weekly_report(
+        self, customer_id: str, period_start, period_end
+    ) -> Optional[str]: ...

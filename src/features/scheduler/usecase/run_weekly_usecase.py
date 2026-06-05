@@ -8,6 +8,7 @@ import pandas as pd
 
 from src.core.db import AsyncSessionLocal
 from src.domain.entity.report import WeeklyReport
+from src.infrastructure.repositories.customer_repository import CustomerRepository
 from src.infrastructure.repositories.report_repository import ReportRepository
 from src.infrastructure.repositories.transaction_repository import TransactionRepository
 from src.ml.autoencoder_service import detect_anomalies, preprocess_for_autoencoder
@@ -39,6 +40,7 @@ class RunWeeklyUseCase:
         async with AsyncSessionLocal() as db:
             trx_repo = TransactionRepository(db)
             report_repo = ReportRepository(db)
+            customer_repo = CustomerRepository(db)
 
             customer_ids = (
                 request.customer_ids or await trx_repo.find_active_customer_ids()
@@ -54,6 +56,7 @@ class RunWeeklyUseCase:
                     period_end,
                     trx_repo,
                     report_repo,
+                    customer_repo,
                     request.dry_run,
                 )
 
@@ -67,6 +70,7 @@ class RunWeeklyUseCase:
         period_end: date,
         trx_repo: TransactionRepository,
         report_repo: ReportRepository,
+        customer_repo: CustomerRepository,
         dry_run: bool,
     ) -> None:
         transactions = await trx_repo.find_debit_last_7_days(customer_ids, period_end)
@@ -114,6 +118,7 @@ class RunWeeklyUseCase:
                     period_start,
                     period_end,
                     report_repo,
+                    customer_repo,
                     dry_run,
                 )
             except Exception as e:
@@ -133,6 +138,7 @@ class RunWeeklyUseCase:
         period_start: date,
         period_end: date,
         report_repo: ReportRepository,
+        customer_repo: CustomerRepository,
         dry_run: bool,
     ) -> None:
         report_id = str(uuid.uuid4())
@@ -144,9 +150,21 @@ class RunWeeklyUseCase:
         needs_nom = int(
             customer_df[customer_df["main_category"] == "needs"]["amount"].sum()
         )
+        savings_nom = int(
+            customer_df[customer_df["main_category"] == "savings"]["amount"].sum()
+        )
         consumable_total = wants_nom + needs_nom
         wants_ratio = wants_nom / consumable_total if consumable_total > 0 else 0.0
         needs_ratio = needs_nom / consumable_total if consumable_total > 0 else 0.0
+
+        top_categories = (
+            customer_df.groupby("sub_category")["amount"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(3)
+            .reset_index()
+            .to_dict("records")
+        )
 
         anomali_list = []
         if X_customer is not None and model_meta is not None:
@@ -180,15 +198,17 @@ class RunWeeklyUseCase:
             else 0.0
         )
 
+        user_name, gaji = await customer_repo.get_profile(customer_id)
+
         top_anomalies = sorted(
             anomali_list, key=lambda a: a.mae / (a.threshold_val + 1e-9), reverse=True
         )[:3]
 
         context = build_weekly_context(
             user_id=customer_id,
-            user_name=customer_id,
+            user_name=user_name,
             persona=persona,
-            gaji=0.0,
+            gaji=gaji,
             saldo_terakhir=saldo_terakhir,
             wants_ratio=wants_ratio,
             needs_ratio=needs_ratio,
@@ -206,10 +226,23 @@ class RunWeeklyUseCase:
             ],
             period_start=str(period_start),
             period_end=str(period_end),
+            top_categories=top_categories,
+            savings_amount=float(savings_nom),
         )
 
+        if not dry_run:
+            existing_id = await report_repo.find_weekly_report(customer_id, period_start, period_end)
+            if existing_id:
+                logger.info(f"[{job_id}] Report already exists for {customer_id} ({period_start}~{period_end}), skipping LLM call")
+                return
+
         try:
-            report_text = await call_llm(context, is_monthly=False)
+            report_text = await call_llm(
+                context,
+                is_monthly=False,
+                persona=persona,
+                has_anomaly=len(anomali_list) > 0,
+            )
         except Exception as e:
             logger.error(f"[{job_id}] LLM call failed for {customer_id}: {e}")
             report_text = None
