@@ -14,6 +14,15 @@ engine = create_async_engine(
     pool_size=10,
     max_overflow=20,
     pool_pre_ping=True,
+    # asyncpg caches prepared-statement plans per physical connection. Behind a
+    # transaction-mode pooler (Supabase/pgbouncer) each transaction may land on a
+    # different backend, so a cached plan can be replayed against a connection
+    # whose schema changed -> InvalidCachedStatementError. Disable both the
+    # asyncpg cache and the SQLAlchemy-dialect prepared-statement cache.
+    connect_args={
+        "statement_cache_size": 0,
+        "prepared_statement_cache_size": 0,
+    },
 )
 
 AsyncSessionLocal = async_sessionmaker(
